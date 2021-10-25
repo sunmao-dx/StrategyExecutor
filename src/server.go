@@ -21,6 +21,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Event.")
 	var ie gitee_utils.Issue
 	_, _, payload, ok, _ := gitee_utils.ValidateWebhook(w, r)
+
 	if !ok {
 		return
 	}
