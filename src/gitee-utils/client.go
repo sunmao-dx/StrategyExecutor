@@ -37,6 +37,11 @@ type Issue struct {
 	PushTime  string `json:"pushTime"`
 }
 
+type RepoInfo struct {
+	Org   string `json:"org"`
+	Repo string `json:"repo"`
+}
+
 func NewClient(getToken func() []byte) Client {
 	token := string(getToken())
 

@@ -11,6 +11,7 @@ import (
 
 
 var token []byte
+var repo []byte
 
 func getToken() []byte {
 	return token
@@ -31,8 +32,13 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventHandler(i gitee_utils.Issue) {
-	org := "mindspore"
-	repo := "mindspore"
+	var repoinfo gitee_utils.RepoInfo
+	err := json.Unmarshal(repo, &repoinfo)
+	if err != nil {
+		return
+	}
+	orgInfo := repoinfo.Org
+	repoInfo := repoinfo.Repo
 	issueID := i.IssueID
 	eventType := i.EventType
 	targetInfo := "请注意"
@@ -48,7 +54,8 @@ func eventHandler(i gitee_utils.Issue) {
 		switch infoType {
 		case "issueComment" :
 			strInfo := targetInfo + " @"+ targetUser + " "
-			res := c.CreateGiteeIssueComment(org, repo, issueID, strInfo)
+			res := c.CreateGiteeIssueComment(orgInfo, repoInfo, issueID, strInfo)
+			fmt.Println(strInfo)
 			if res != nil {
 				fmt.Println(res.Error())
 				return
@@ -71,6 +78,8 @@ func loadFile(path, fileType string) error {
 	switch {
 	case fileType == "token" :
 		token = byteValue
+	case fileType == "repo" :
+		repo = byteValue
 	default:
 		fmt.Printf("no filetype\n" )
 	}
@@ -79,10 +88,11 @@ func loadFile(path, fileType string) error {
 
 func configFile() {
 	loadFile("src/data/token.md", "token")
+	loadFile("src/data/repo.json", "repo")
 }
 
 func main() {
-	loadFile("src/data/token.md", "json")
+	configFile()
 	http.HandleFunc("/api/Executor/execute-event/", ServeHTTP)
 	http.ListenAndServe(":8002", nil)
 }
