@@ -124,7 +124,7 @@ func (c *Consumer) Start() error {
 		c.config.ExchangeName,
 		c.config.ExchangeType,
 		true,
-		false,
+		true,
 		false,
 		false,
 		nil,
@@ -135,7 +135,7 @@ func (c *Consumer) Start() error {
 	if _, err := chn.QueueDeclare(
 		c.config.QueueName,
 		true,
-		false,
+		true,
 		false,
 		false,
 		amqp.Table{"x-queue-mode": "lazy"},

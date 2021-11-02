@@ -34,7 +34,6 @@ func doRabbitMQ() {
 	if err := rbt.Connect(); err != nil {
 		log.Fatalln("unable to connect to rabbit", err)
 	}
-	//
 
 	// Consumer
 	cc := gitee_utils.ConsumerConfig{
