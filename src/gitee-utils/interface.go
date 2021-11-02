@@ -1,13 +1,13 @@
 package gitee_utils
 
 import (
-	sdk "gitee.com/openeuler/go-gitee/gitee"
 	"net/http"
+
+	sdk "gitee.com/openeuler/go-gitee/gitee"
 )
 
 // Client interface for Gitee API
 type Client interface {
-
 	CreatePullRequest(org, repo, title, body, head, base string, canModify bool) (sdk.PullRequest, error)
 	GetPullRequests(org, repo string, opts ListPullRequestOpt) ([]sdk.PullRequest, error)
 	UpdatePullRequest(org, repo string, number int32, param sdk.PullRequestUpdateParam) (sdk.PullRequest, error)
@@ -15,7 +15,7 @@ type Client interface {
 	GetRef(org, repo, ref string) (string, error)
 	GetPRLabels(org, repo string, number int) ([]sdk.Label, error)
 	ListPRComments(org, repo string, number int) ([]sdk.PullRequestComments, error)
-	ListPrIssues(org, repo string, number int32) ([] sdk.Issue, error)
+	ListPrIssues(org, repo string, number int32) ([]sdk.Issue, error)
 	DeletePRComment(org, repo string, ID int) error
 	CreatePRComment(org, repo string, number int, comment string) error
 	UpdatePRComment(org, repo string, commentID int, comment string) error
@@ -40,11 +40,11 @@ type Client interface {
 	RemoveIssueLabel(org, repo, number, label string) error
 	AddIssueLabel(org, repo, number string, label []string) error
 	AddIssueAssignee(org, repo, number, token, assignee string) error
-	GetUserOrg(login string) ([]sdk.Group ,error)
-	GetUserEnt(ent, login string) (sdk.EnterpriseMember ,error)
+	GetUserOrg(login string) ([]sdk.Group, error)
+	GetUserEnt(ent, login string) (sdk.EnterpriseMember, error)
 
 	ListIssues(owner, repo, state, since, createAt string, page, perPage int) ([]sdk.Issue, *http.Response, error)
-	ListLabels(owner, repo string) ([]sdk.Label ,error)
+	ListLabels(owner, repo string) ([]sdk.Label, error)
 	GetRecommendation(labels string) (string, error)
 }
 
