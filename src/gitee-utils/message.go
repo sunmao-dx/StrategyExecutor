@@ -216,7 +216,7 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	msgs, err := channel.Consume(
 		c.config.QueueName,
 		fmt.Sprintf("%s (%d/%d)", c.config.ConsumerName, id, c.config.ConsumerCount),
-		false,
+		true,
 		false,
 		false,
 		false,
@@ -231,15 +231,12 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	log.Println("[", id, "] Running ...")
 	log.Println("[", id, "] Press CTRL+C to exit ...")
 
-	forever := make(chan bool)
 	for msg := range msgs {
 		err := eventHandler(msg)
 		if err != nil {
 			log.Println("something wrong with executor", err)
 		}
 	}
-	<-forever
-
 	log.Println("[", id, "] Exiting ...")
 }
 
