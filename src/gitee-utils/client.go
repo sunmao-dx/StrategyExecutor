@@ -23,23 +23,30 @@ type client struct {
 	userData *sdk.User
 }
 
+type RepoInfo struct {
+	Org  string `json:"org"`
+	Repo string `json:"repo"`
+}
+
 type TargetInfo struct {
-	TargetUser string `json:"targetUser"`
-	InfoType string `json:"infoType"`
+	TargetUser  []string    `json:"targetUser"`
+	InfoType    string      `json:"infoType"`
+	InfoContent InfoContent `json:"infoContent"`
+}
+
+type InfoContent struct {
+	ChineseContent string `json:"Chinese"`
+	EnglishContent string `json:"English"`
+	GeneralContent string `json:"general_content"`
 }
 
 type Issue struct {
-	IssueID   string `json:"issueID"`
-	EventType string `json:"eventType"`
-	TargetInfo TargetInfo `json:"targetInfo"`
-	TargetLabel  string `json:"targetLabel"`
-	TargetAssigneeID  string `json:"targetAssigneeID"`
-	PushTime  string `json:"pushTime"`
-}
-
-type RepoInfo struct {
-	Org   string `json:"org"`
-	Repo string `json:"repo"`
+	IssueID          string     `json:"issueID"`
+	EventType        string     `json:"eventType"`
+	TargetInfo       TargetInfo `json:"targetInfo"`
+	TargetLabel      string     `json:"targetLabel"`
+	TargetAssigneeID string     `json:"targetAssigneeID"`
+	PushTime         string     `json:"pushTime"`
 }
 
 func NewClient(getToken func() []byte) Client {
@@ -291,7 +298,7 @@ func (c *client) GetPRCommits(org, repo string, number int) ([]sdk.PullRequestCo
 }
 
 func (c *client) AssignGiteeIssue(org, repo, labels string, number string, login string) error {
-    var labelStr []string
+	var labelStr []string
 	labelsToAddStr := ""
 
 	ll, _, errll := c.ac.LabelsApi.GetV5ReposOwnerRepoLabels(context.Background(), org, repo, nil)
@@ -314,12 +321,12 @@ func (c *client) AssignGiteeIssue(org, repo, labels string, number string, login
 		return formatErr(nil, "assign assignee to issue")
 	}
 
-	labelsToAddStr = strings.Join(labelStr,",")
+	labelsToAddStr = strings.Join(labelStr, ",")
 
 	opt := sdk.IssueUpdateParam{
 		Repo:     repo,
 		Assignee: login,
-		Labels: labelsToAddStr,
+		Labels:   labelsToAddStr,
 	}
 
 	_, v, err := c.ac.IssuesApi.PatchV5ReposOwnerIssuesNumber(
@@ -430,17 +437,17 @@ func (c *client) AddIssueAssignee(org, repo, number, token, assignee string) err
 	return formatErr(err, "issue update")
 }
 
-func (c *client) GetUserOrg(login string) ([]sdk.Group ,error) {
+func (c *client) GetUserOrg(login string) ([]sdk.Group, error) {
 	group, _, err := c.ac.OrganizationsApi.GetV5UsersUsernameOrgs(context.Background(), login, nil)
 	return group, formatErr(err, "get org")
 }
 
-func (c *client) GetUserEnt(ent, login string) (sdk.EnterpriseMember ,error) {
-	member, _, err := c.ac.EnterprisesApi.GetV5EnterprisesEnterpriseMembersUsername(context.Background(), ent, login,nil)
+func (c *client) GetUserEnt(ent, login string) (sdk.EnterpriseMember, error) {
+	member, _, err := c.ac.EnterprisesApi.GetV5EnterprisesEnterpriseMembersUsername(context.Background(), ent, login, nil)
 	return member, formatErr(err, "get ent")
 }
 
-func (c *client) ListIssues(owner, repo, state, since, createAt string, page, perPage int) ([]sdk.Issue, *http.Response ,error) {
+func (c *client) ListIssues(owner, repo, state, since, createAt string, page, perPage int) ([]sdk.Issue, *http.Response, error) {
 	oState := optional.NewString(state)
 	oPage := optional.NewInt32(int32(page))
 	oPerPage := optional.NewInt32(int32(perPage))
@@ -448,10 +455,10 @@ func (c *client) ListIssues(owner, repo, state, since, createAt string, page, pe
 	oCreateAt := optional.NewString(createAt)
 	issueParam := sdk.GetV5ReposOwnerRepoIssuesOpts{State: oState, Page: oPage, PerPage: oPerPage, Since: oSince, CreatedAt: oCreateAt}
 	issues, res, err := c.ac.IssuesApi.GetV5ReposOwnerRepoIssues(context.Background(), owner, repo, &issueParam)
-	return issues, res,formatErr(err, "list issues")
+	return issues, res, formatErr(err, "list issues")
 }
 
-func (c *client) ListLabels(owner, repo string) ([]sdk.Label ,error) {
+func (c *client) ListLabels(owner, repo string) ([]sdk.Label, error) {
 	labels, _, err := c.ac.LabelsApi.GetV5ReposOwnerRepoLabels(context.Background(), owner, repo, nil)
 	return labels, formatErr(err, "list labels")
 }
@@ -459,8 +466,8 @@ func (c *client) ListLabels(owner, repo string) ([]sdk.Label ,error) {
 func (c *client) GetRecommendation(labels string) (string, error) {
 	// create path and map variables
 	urlValues := url.Values{}
-	urlValues.Add("labels",labels)
-	resp, err := http.PostForm("http://34.92.52.47/predict",urlValues)
+	urlValues.Add("labels", labels)
+	resp, err := http.PostForm("http://34.92.52.47/predict", urlValues)
 	if err != nil {
 		// handle error
 		formatErr(err, "request error")
