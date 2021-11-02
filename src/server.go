@@ -56,6 +56,6 @@ func doRabbitMQ() {
 }
 
 func main() {
-	configFile()
+	gitee_utils.ConfigFile()
 	doRabbitMQ()
 }

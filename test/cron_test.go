@@ -3,8 +3,6 @@ package test
 import (
 	"encoding/csv"
 	"fmt"
-	gitee_utils "gitee.com/lizi/test-bot/src/gitee-utils"
-	"github.com/robfig/cron/v3"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -13,9 +11,12 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	gitee_utils "gitee.com/lizi/test-bot/src/gitee-utils"
+	"github.com/robfig/cron/v3"
 )
 
-func TestCronRun(t *testing.T){
+func TestCronRun(t *testing.T) {
 	//DoTime()
 	//Remind()
 	getUrl()
@@ -39,8 +40,8 @@ func getToken() []byte {
 
 func getUrl() {
 	urlValues := url.Values{}
-	urlValues.Add("labels","comp/data")
-	resp, _ := http.PostForm("http://34.92.52.47/predict",urlValues)
+	urlValues.Add("labels", "comp/data")
+	resp, _ := http.PostForm("http://34.92.52.47/predict", urlValues)
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	participants := string(body[:])
@@ -85,12 +86,12 @@ func DoTime() {
 	perPage := 100
 	assigneeInit := ""
 	cz := time.FixedZone("CST", 8*3600)
-	fmt.Println(time.Now().AddDate(0,0,-60).In(cz).Format(time.RFC3339))
+	fmt.Println(time.Now().AddDate(0, 0, -60).In(cz).Format(time.RFC3339))
 	//time.Sleep(time.Minute * 1)
 
-	since := time.Now().AddDate(0,0,-15).In(cz)
+	since := time.Now().AddDate(0, 0, -15).In(cz)
 
-	fromStr := time.Now().AddDate(0,0,-150).In(cz).Format(time.RFC3339)
+	fromStr := time.Now().AddDate(0, 0, -150).In(cz).Format(time.RFC3339)
 
 	csvFile, err := os.Create("../src/data/IssueResAlert.csv")
 	if err != nil {
@@ -106,8 +107,7 @@ func DoTime() {
 		fmt.Println(res.Error())
 		return
 	} else {
-		if p, err := strconv.Atoi(response.Header.Get("total_page"));
-		err == nil {
+		if p, err := strconv.Atoi(response.Header.Get("total_page")); err == nil {
 			for i := 1; i <= p; i++ {
 				issues, _, res := c.ListIssues(owner, repo, state, fromStr, "", i, perPage)
 				if res != nil {
@@ -115,13 +115,13 @@ func DoTime() {
 					return
 				} else {
 					for _, issue := range issues {
-						if issue.UpdatedAt.In(cz).Before(since) == false{
+						if issue.UpdatedAt.In(cz).Before(since) == false {
 							continue
 						}
 						if issue.Assignee != nil {
 							assigneeInit = issue.Assignee.Login
 						}
-						w.Write([]string{issue.User.Login, assigneeInit ,issue.Number, issue.UpdatedAt.In(cz).Format(time.RFC3339)})
+						w.Write([]string{issue.User.Login, assigneeInit, issue.Number, issue.UpdatedAt.In(cz).Format(time.RFC3339)})
 						w.Flush()
 						assigneeInit = ""
 					}
