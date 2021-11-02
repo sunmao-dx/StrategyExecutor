@@ -231,13 +231,14 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	log.Println("[", id, "] Running ...")
 	log.Println("[", id, "] Press CTRL+C to exit ...")
 
+	forever := make(chan bool)
 	for msg := range msgs {
 		err := eventHandler(msg)
 		if err != nil {
 			log.Println("something wrong with executor", err)
-			return
 		}
 	}
+	<-forever
 
 	log.Println("[", id, "] Exiting ...")
 }
