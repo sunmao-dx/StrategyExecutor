@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -249,11 +250,14 @@ func getToken() []byte {
 func eventHandler(msg amqp.Delivery) error {
 	var repoinfo RepoInfo
 	var msginfo Issue
+	lineBreaker := "\n"
+	log.Println(string(msg.Body))
 	err := json.Unmarshal(repo, &repoinfo)
 	if err != nil {
 		log.Println("wrong repo", err)
 		return err
 	}
+
 	err = json.Unmarshal(msg.Body, &msginfo)
 	if err != nil {
 		log.Println("wrong msg.body", err)
@@ -263,16 +267,20 @@ func eventHandler(msg amqp.Delivery) error {
 	repoInfo := repoinfo.Repo
 	issueID := msginfo.IssueID
 	eventType := msginfo.EventType
-	targetInfo := "请注意"
-	targetUser := msginfo.TargetInfo.TargetUser
+	generalContent := msginfo.TargetInfo.InfoContent.GeneralContent
+	chineseContent := msginfo.TargetInfo.InfoContent.ChineseContent
+	englishContent := msginfo.TargetInfo.InfoContent.EnglishContent
 	infoType := msginfo.TargetInfo.InfoType
+	targetUser := msginfo.TargetInfo.TargetUser
 	c := NewClient(getToken)
 
 	switch eventType {
 	case "info":
 		switch infoType {
 		case "issueComment":
-			strInfo := targetInfo + " @" + targetUser + " "
+			infoTemp := strings.Replace(generalContent, "{"+"mainCaller1"+"}", fmt.Sprintf("%v", targetUser[0]), -1)
+			infoTemp = strings.Replace(infoTemp, "{"+"mainCaller2"+"}", fmt.Sprintf("%v", targetUser[1]), -1)
+			strInfo := englishContent + lineBreaker + chineseContent + lineBreaker + infoTemp
 			res := c.CreateGiteeIssueComment(orgInfo, repoInfo, issueID, strInfo)
 			fmt.Println(strInfo)
 			if res != nil {
