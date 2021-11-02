@@ -259,10 +259,6 @@ func eventHandler(msg amqp.Delivery) error {
 		log.Println("wrong msg.body", err)
 		return err
 	}
-	if err := msg.Ack(false); err != nil {
-		// TODO: Should DLX the message
-		log.Println("unable to acknowledge the message, dropped", err)
-	}
 	orgInfo := repoinfo.Org
 	repoInfo := repoinfo.Repo
 	issueID := msginfo.IssueID
