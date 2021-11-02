@@ -120,38 +120,38 @@ func (c *Consumer) Start() error {
 		return err
 	}
 
-	if err := chn.ExchangeDeclare(
-		c.config.ExchangeName,
-		c.config.ExchangeType,
-		true,
-		true,
-		false,
-		false,
-		nil,
-	); err != nil {
-		return err
-	}
+	// if err := chn.ExchangeDeclare(
+	// 	c.config.ExchangeName,
+	// 	c.config.ExchangeType,
+	// 	true,
+	// 	true,
+	// 	false,
+	// 	false,
+	// 	nil,
+	// ); err != nil {
+	// 	return err
+	// }
 
-	if _, err := chn.QueueDeclare(
-		c.config.QueueName,
-		true,
-		true,
-		false,
-		false,
-		amqp.Table{"x-queue-mode": "lazy"},
-	); err != nil {
-		return err
-	}
+	// if _, err := chn.QueueDeclare(
+	// 	c.config.QueueName,
+	// 	true,
+	// 	true,
+	// 	false,
+	// 	false,
+	// 	amqp.Table{"x-queue-mode": "lazy"},
+	// ); err != nil {
+	// 	return err
+	// }
 
-	if err := chn.QueueBind(
-		c.config.QueueName,
-		c.config.RoutingKey,
-		c.config.ExchangeName,
-		false,
-		nil,
-	); err != nil {
-		return err
-	}
+	// if err := chn.QueueBind(
+	// 	c.config.QueueName,
+	// 	c.config.RoutingKey,
+	// 	c.config.ExchangeName,
+	// 	false,
+	// 	nil,
+	// ); err != nil {
+	// 	return err
+	// }
 
 	if err := chn.Qos(c.config.PrefetchCount, 0, false); err != nil {
 		return err
