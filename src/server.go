@@ -50,7 +50,6 @@ func doRabbitMQ() {
 	if err := csm.Start(); err != nil {
 		log.Fatalln("unable to start consumer", err)
 	}
-
 	select {}
 }
 
