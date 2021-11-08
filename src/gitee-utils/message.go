@@ -121,39 +121,6 @@ func (c *Consumer) Start() error {
 		return err
 	}
 
-	// if err := chn.ExchangeDeclare(
-	// 	c.config.ExchangeName,
-	// 	c.config.ExchangeType,
-	// 	true,
-	// 	true,
-	// 	false,
-	// 	false,
-	// 	nil,
-	// ); err != nil {
-	// 	return err
-	// }
-
-	// if _, err := chn.QueueDeclare(
-	// 	c.config.QueueName,
-	// 	true,
-	// 	true,
-	// 	false,
-	// 	false,
-	// 	amqp.Table{"x-queue-mode": "lazy"},
-	// ); err != nil {
-	// 	return err
-	// }
-
-	// if err := chn.QueueBind(
-	// 	c.config.QueueName,
-	// 	c.config.RoutingKey,
-	// 	c.config.ExchangeName,
-	// 	false,
-	// 	nil,
-	// ); err != nil {
-	// 	return err
-	// }
-
 	if err := chn.Qos(c.config.PrefetchCount, 0, false); err != nil {
 		return err
 	}
@@ -277,7 +244,7 @@ func eventHandler(msg amqp.Delivery) error {
 	switch eventType {
 	case "info":
 		switch infoType {
-		case "issueComment":
+		case "AssigneeReminder":
 			infoTemp := strings.Replace(generalContent, "{"+"mainCaller1"+"}", fmt.Sprintf("%v", targetUser[0]), -1)
 			infoTemp = strings.Replace(infoTemp, "{"+"mainCaller2"+"}", fmt.Sprintf("%v", targetUser[1]), -1)
 			strInfo := englishContent + lineBreaker + chineseContent + lineBreaker + infoTemp
@@ -287,7 +254,16 @@ func eventHandler(msg amqp.Delivery) error {
 				fmt.Println(res.Error())
 				return res
 			}
+		case "LabelReminder":
+			strInfo := englishContent + lineBreaker + chineseContent
+			res := c.CreateGiteeIssueComment(orgInfo, repoInfo, issueID, strInfo)
+			fmt.Println(strInfo)
+			if res != nil {
+				fmt.Println(res.Error())
+				return res
+			}
 		}
+
 	default:
 		return nil
 	}
