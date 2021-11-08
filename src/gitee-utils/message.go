@@ -255,7 +255,7 @@ func eventHandler(msg amqp.Delivery) error {
 				return res
 			}
 		case "LabelReminder":
-			strInfo := englishContent + lineBreaker + chineseContent
+			strInfo := generalContent
 			res := c.CreateGiteeIssueComment(orgInfo, repoInfo, issueID, strInfo)
 			fmt.Println(strInfo)
 			if res != nil {
