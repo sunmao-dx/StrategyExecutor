@@ -30,29 +30,10 @@ func doRabbitMQ() {
 		VHost:          RMQ_VHOST,
 		ConnectionName: "",
 	}
-	// rc := gitee_utils.RabbitConfig{
-	// 	Schema:         "amqp",
-	// 	Username:       "guest",
-	// 	Password:       "guest",
-	// 	Host:           "140.83.83.152",
-	// 	Port:           "8090",
-	// 	VHost:          "",
-	// 	ConnectionName: "",
-	// }
 	rbt := gitee_utils.NewRabbit(rc)
 	if err := rbt.Connect(); err != nil {
 		log.Fatalln("unable to connect to rabbit", err)
 	}
-
-	// Consumer
-	// cc := gitee_utils.ConsumerConfig{
-	// 	ExchangeName:  "lz.direct",
-	// 	ExchangeType:  "direct",
-	// 	RoutingKey:    "lz.issue",
-	// 	QueueName:     "lz.issue",
-	// 	ConsumerCount: 1,
-	// 	PrefetchCount: 1,
-	// }
 	cc := gitee_utils.ConsumerConfig{
 		ExchangeName:  RMQ_EXCHANGE_NAME,
 		ExchangeType:  RMQ_EXCHANGE_TYPE,
