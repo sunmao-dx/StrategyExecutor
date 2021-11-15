@@ -17,13 +17,10 @@ limitations under the License.
 package gitee_utils
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
-	"fmt"
-	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/sirupsen/logrus"
 )
 
 // ValidateWebhook ensures that the provided request conforms to the
@@ -41,42 +38,10 @@ func ValidateWebhook(w http.ResponseWriter, r *http.Request) (string, string, []
 	return "", "", payload, true, http.StatusOK
 }
 
-func payloadSignature(timestamp, key string) string {
-	mac := hmac.New(sha256.New, []byte(key))
-
-	c := fmt.Sprintf("%s\n%s", timestamp, string(key))
-	mac.Write([]byte(c))
-
-	h := mac.Sum(nil)
-
-	return base64.StdEncoding.EncodeToString(h)
-}
-
 func responseHTTPError(w http.ResponseWriter, statusCode int, response string) {
 	logrus.WithFields(logrus.Fields{
 		"response":    response,
 		"status-code": statusCode,
 	}).Debug(response)
 	http.Error(w, response, statusCode)
-}
-
-func extractHmacs(tokenGenerator func() []byte) ([][]byte, error) {
-	t := tokenGenerator()
-	return [][]byte{t}, nil
-}
-
-func validatePayload(sig string, tokenGenerator func() []byte, ps func(string) string) bool {
-	hmacs, err := extractHmacs(tokenGenerator)
-	if err != nil {
-		logrus.WithError(err).Error("couldn't unmarshal the hmac secret")
-		return false
-	}
-
-	// If we have a match with any valid hmac, we can validate successfully.
-	for _, key := range hmacs {
-		if sig == ps(string(key)) {
-			return true
-		}
-	}
-	return false
 }

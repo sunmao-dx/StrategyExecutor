@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 	"time"
 
 	gitee_utils "gitee.com/lizi/test-bot/src/gitee-utils"
+	"github.com/sirupsen/logrus"
 )
 
 func doRabbitMQ() {
@@ -32,7 +32,9 @@ func doRabbitMQ() {
 	}
 	rbt := gitee_utils.NewRabbit(rc)
 	if err := rbt.Connect(); err != nil {
-		log.Fatalln("unable to connect to rabbit", err)
+		gitee_utils.LogInstance.WithFields(logrus.Fields{
+			"context": "Rabbitmq connect error",
+		}).Info("info log")
 	}
 	cc := gitee_utils.ConsumerConfig{
 		ExchangeName:  RMQ_EXCHANGE_NAME,
@@ -46,7 +48,9 @@ func doRabbitMQ() {
 	cc.Reconnect.Interval = 1 * time.Second
 	csm := gitee_utils.NewConsumer(cc, rbt)
 	if err := csm.Start(); err != nil {
-		log.Fatalln("unable to start consumer", err)
+		gitee_utils.LogInstance.WithFields(logrus.Fields{
+			"context": "Consumer setup error",
+		}).Info("info log")
 	}
 	select {}
 }
