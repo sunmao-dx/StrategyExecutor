@@ -215,30 +215,41 @@ func getToken() []byte {
 }
 
 func eventHandler(msg amqp.Delivery) error {
-	var repoinfo RepoInfo
-	var msginfo Issue
+	var repoInfo RepoInfo
+	var msgInfo Issue
+	var orgInfo string
+	var repoNameInfo string
 	lineBreaker := "\n"
 	log.Println(string(msg.Body))
-	err := json.Unmarshal(repo, &repoinfo)
+	err := json.Unmarshal(repo, &repoInfo)
 	if err != nil {
 		log.Println("wrong repo", err)
 		return err
 	}
 
-	err = json.Unmarshal(msg.Body, &msginfo)
+	err = json.Unmarshal(msg.Body, &msgInfo)
 	if err != nil {
 		log.Println("wrong msg.body", err)
 		return err
 	}
-	orgInfo := repoinfo.Org
-	repoInfo := repoinfo.Repo
-	issueID := msginfo.IssueID
-	eventType := msginfo.EventType
-	generalContent := msginfo.TargetInfo.InfoContent.GeneralContent
-	chineseContent := msginfo.TargetInfo.InfoContent.ChineseContent
-	englishContent := msginfo.TargetInfo.InfoContent.EnglishContent
-	infoType := msginfo.TargetInfo.InfoType
-	targetUser := msginfo.TargetInfo.TargetUser
+	if os.Getenv("Org") != "" {
+		orgInfo = os.Getenv("Org")
+	} else {
+		orgInfo = repoInfo.Org
+	}
+
+	if os.Getenv("Repo") != "" {
+		repoNameInfo = os.Getenv("Repo")
+	} else {
+		repoNameInfo = repoInfo.Repo
+	}
+	issueID := msgInfo.IssueID
+	eventType := msgInfo.EventType
+	generalContent := msgInfo.TargetInfo.InfoContent.GeneralContent
+	chineseContent := msgInfo.TargetInfo.InfoContent.ChineseContent
+	englishContent := msgInfo.TargetInfo.InfoContent.EnglishContent
+	infoType := msgInfo.TargetInfo.InfoType
+	targetUser := msgInfo.TargetInfo.TargetUser
 	c := NewClient(getToken)
 
 	switch eventType {
@@ -248,7 +259,7 @@ func eventHandler(msg amqp.Delivery) error {
 			infoTemp := strings.Replace(generalContent, "{"+"mainCaller1"+"}", fmt.Sprintf("%v", targetUser[0]), -1)
 			infoTemp = strings.Replace(infoTemp, "{"+"mainCaller2"+"}", fmt.Sprintf("%v", targetUser[1]), -1)
 			strInfo := englishContent + lineBreaker + chineseContent + lineBreaker + infoTemp
-			res := c.CreateGiteeIssueComment(orgInfo, repoInfo, issueID, strInfo)
+			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
 			fmt.Println(strInfo)
 			if res != nil {
 				fmt.Println(res.Error())
@@ -256,7 +267,7 @@ func eventHandler(msg amqp.Delivery) error {
 			}
 		case "LabelReminder":
 			strInfo := generalContent
-			res := c.CreateGiteeIssueComment(orgInfo, repoInfo, issueID, strInfo)
+			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
 			fmt.Println(strInfo)
 			if res != nil {
 				fmt.Println(res.Error())
