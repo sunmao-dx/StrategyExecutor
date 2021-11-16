@@ -269,6 +269,9 @@ func eventHandler(msg amqp.Delivery) error {
 				}).Info("info log")
 				return res
 			}
+			LogInstance.WithFields(logrus.Fields{
+				"context": "AssigneeReminder CreateGiteeIssueComment success",
+			}).Info("info log")
 		case "LabelReminder":
 			strInfo := generalContent
 			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
@@ -280,6 +283,9 @@ func eventHandler(msg amqp.Delivery) error {
 				fmt.Println(res.Error())
 				return res
 			}
+			LogInstance.WithFields(logrus.Fields{
+				"context": "LabelReminder CreateGiteeIssueComment success",
+			}).Info("info log")
 		}
 
 	default:
