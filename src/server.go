@@ -19,16 +19,18 @@ func doRabbitMQ() {
 	RMQ_ROUTINGKEY := os.Getenv("RMQ_ROUTINGKEY")
 	RMQ_EXCHANGE_NAME := os.Getenv("RMQ_EXCHANGE_NAME")
 	RMQ_EXCHANGE_TYPE := os.Getenv("RMQ_EXCHANGE_TYPE")
+	RMQ_SCHEMA := "amqp"
+	RMQ_CONNAME := ""
 
 	//RabbitMQ
 	rc := gitee_utils.RabbitConfig{
-		Schema:         "amqp",
+		Schema:         RMQ_SCHEMA,
 		Username:       RMQ_USER,
 		Password:       RMQ_PASS,
 		Host:           RMQ_HOST,
 		Port:           RMQ_PORT,
 		VHost:          RMQ_VHOST,
-		ConnectionName: "",
+		ConnectionName: RMQ_CONNAME,
 	}
 	rbt := gitee_utils.NewRabbit(rc)
 	if err := rbt.Connect(); err != nil {
@@ -52,6 +54,9 @@ func doRabbitMQ() {
 			"context": "Consumer setup error",
 		}).Info("info log")
 	}
+	gitee_utils.LogInstance.WithFields(logrus.Fields{
+		"context": "Consumer action success",
+	}).Info("info log")
 	select {}
 }
 

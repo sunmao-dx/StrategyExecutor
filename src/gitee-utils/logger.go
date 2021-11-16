@@ -12,7 +12,7 @@ import (
 
 var (
 	logPath = "src/log"
-	logFile = "retriever.log"
+	logFile = "executor.log"
 )
 var LogInstance = logrus.New()
 
