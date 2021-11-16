@@ -11,6 +11,7 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/sirupsen/logrus"
 )
 
 type RabbitConfig struct {
@@ -263,6 +264,9 @@ func eventHandler(msg amqp.Delivery) error {
 			fmt.Println(strInfo)
 			if res != nil {
 				fmt.Println(res.Error())
+				LogInstance.WithFields(logrus.Fields{
+					"context": "AssigneeReminder CreateGiteeIssueComment error",
+				}).Info("info log")
 				return res
 			}
 		case "LabelReminder":
@@ -270,6 +274,9 @@ func eventHandler(msg amqp.Delivery) error {
 			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
 			fmt.Println(strInfo)
 			if res != nil {
+				LogInstance.WithFields(logrus.Fields{
+					"context": "LabelReminder CreateGiteeIssueComment error",
+				}).Info("info log")
 				fmt.Println(res.Error())
 				return res
 			}
