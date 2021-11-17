@@ -224,13 +224,17 @@ func eventHandler(msg amqp.Delivery) error {
 	log.Println(string(msg.Body))
 	err := json.Unmarshal(repo, &repoInfo)
 	if err != nil {
-		log.Println("wrong repo", err)
+		LogInstance.WithFields(logrus.Fields{
+			"context": "wrong repo",
+		}).Info("info log")
 		return err
 	}
 
 	err = json.Unmarshal(msg.Body, &msgInfo)
 	if err != nil {
-		log.Println("wrong msg.body", err)
+		LogInstance.WithFields(logrus.Fields{
+			"context": "wrong msgbody",
+		}).Info("info log")
 		return err
 	}
 	if os.Getenv("Org") != "" {
@@ -271,11 +275,12 @@ func eventHandler(msg amqp.Delivery) error {
 			}
 			LogInstance.WithFields(logrus.Fields{
 				"context": "AssigneeReminder CreateGiteeIssueComment success",
+				"body":    strInfo,
+				"msg":     string(msg.Body),
 			}).Info("info log")
 		case "LabelReminder":
 			strInfo := generalContent
 			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
-			fmt.Println(strInfo)
 			if res != nil {
 				LogInstance.WithFields(logrus.Fields{
 					"context": "LabelReminder CreateGiteeIssueComment error",
@@ -285,6 +290,8 @@ func eventHandler(msg amqp.Delivery) error {
 			}
 			LogInstance.WithFields(logrus.Fields{
 				"context": "LabelReminder CreateGiteeIssueComment success",
+				"body":    strInfo,
+				"msg":     string(msg.Body),
 			}).Info("info log")
 		}
 
