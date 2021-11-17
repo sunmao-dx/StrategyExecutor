@@ -221,7 +221,6 @@ func eventHandler(msg amqp.Delivery) error {
 	var orgInfo string
 	var repoNameInfo string
 	lineBreaker := "\n"
-	log.Println(string(msg.Body))
 	err := json.Unmarshal(repo, &repoInfo)
 	if err != nil {
 		LogInstance.WithFields(logrus.Fields{
