@@ -201,6 +201,7 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	log.Println("[", id, "] Press CTRL+C to exit ...")
 
 	for msg := range msgs {
+		return
 		err := eventHandler(msg)
 		if err != nil {
 			log.Println("something wrong with executor", err)
@@ -222,6 +223,7 @@ func eventHandler(msg amqp.Delivery) error {
 	var orgInfo string
 	var repoNameInfo string
 	lineBreaker := "\n"
+
 	err := json.Unmarshal(repo, &repoInfo)
 	if err != nil {
 		LogInstance.WithFields(logrus.Fields{
