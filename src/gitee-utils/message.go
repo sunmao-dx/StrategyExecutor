@@ -204,8 +204,10 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 		err := eventHandler(msg)
 		if err != nil {
 			log.Println("something wrong with executor", err)
+		} else {
+			msg.Acknowledger.Ack(msg.DeliveryTag, false)
 		}
-		msg.Acknowledger.Ack(msg.DeliveryTag, false)
+
 	}
 	log.Println("[", id, "] Exiting ...")
 }
