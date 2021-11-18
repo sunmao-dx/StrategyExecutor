@@ -185,7 +185,7 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	msgs, err := channel.Consume(
 		c.config.QueueName,
 		fmt.Sprintf("%s (%d/%d)", c.config.ConsumerName, id, c.config.ConsumerCount),
-		true,
+		false,
 		false,
 		false,
 		false,
@@ -205,6 +205,7 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 		if err != nil {
 			log.Println("something wrong with executor", err)
 		}
+		msg.Acknowledger.Ack(msg.DeliveryTag, false)
 	}
 	log.Println("[", id, "] Exiting ...")
 }
