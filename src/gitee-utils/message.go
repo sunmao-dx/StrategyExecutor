@@ -201,7 +201,6 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	log.Println("[", id, "] Press CTRL+C to exit ...")
 
 	for msg := range msgs {
-		return
 		err := eventHandler(msg)
 		if err != nil {
 			log.Println("something wrong with executor", err)
