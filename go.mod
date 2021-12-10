@@ -1,4 +1,4 @@
-module gitee.com/lizi/test-bot
+module gitee.com/sunmao-dx/strategy-executor
 
 go 1.16
 
@@ -11,5 +11,4 @@ require (
 	github.com/sirupsen/logrus v1.8.1
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
-
 )
