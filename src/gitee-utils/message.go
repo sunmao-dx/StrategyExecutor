@@ -210,6 +210,11 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 
 	}
 	log.Println("[", id, "] Exiting ...")
+	LogInstance.WithFields(logrus.Fields{
+		"context": "LabelReminder CreateGiteeIssueComment success",
+		"body":    "Consume goes wrong, the process is exiting...",
+	}).Info("info log")
+	os.Exit(1)
 }
 
 func getToken() []byte {
