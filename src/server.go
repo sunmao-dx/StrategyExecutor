@@ -4,7 +4,7 @@ import (
 	"os"
 	"time"
 
-	gitee_utils "gitee.com/lizi/test-bot/src/gitee-utils"
+	gitee_utils "gitee.com/sunmao-dx/strategy-executor/src/gitee-utils"
 	"github.com/sirupsen/logrus"
 )
 
