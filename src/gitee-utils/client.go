@@ -24,6 +24,7 @@ type client struct {
 type RepoInfo struct {
 	Org  string `json:"org"`
 	Repo string `json:"repo"`
+	Ent  string `json:"ent"`
 }
 
 type TargetInfo struct {
@@ -45,6 +46,7 @@ type Issue struct {
 	TargetLabel      string     `json:"targetLabel"`
 	TargetAssigneeID string     `json:"targetAssigneeID"`
 	PushTime         string     `json:"pushTime"`
+	RepoInfo         RepoInfo   `json:"repoInfo"`
 }
 
 func NewClient(getToken func() []byte) Client {
