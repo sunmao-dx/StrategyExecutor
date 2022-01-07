@@ -258,6 +258,9 @@ func eventHandler(msg amqp.Delivery) error {
 				fmt.Println(res.Error())
 				LogInstance.WithFields(logrus.Fields{
 					"context": "AssigneeReminder CreateGiteeIssueComment error",
+                    "orgInfo": orgInfo,
+                    "repoNameInfo": repoNameInfo,
+                    "issueID": issueID,
 				}).Info("info log")
 				return res
 			}
