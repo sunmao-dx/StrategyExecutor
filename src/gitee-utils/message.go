@@ -224,39 +224,20 @@ func getToken() []byte {
 }
 
 func eventHandler(msg amqp.Delivery) error {
-	var repoInfo RepoInfo
 	var msgInfo Issue
-	var orgInfo string
-	var repoNameInfo string
 	lineBreaker := "\n"
-	err := json.Unmarshal(repo, &repoInfo)
-	if err != nil {
-		LogInstance.WithFields(logrus.Fields{
-			"context": "wrong repo",
-		}).Info("info log")
-		return err
-	}
 
-	err = json.Unmarshal(msg.Body, &msgInfo)
+	err := json.Unmarshal(msg.Body, &msgInfo)
 	if err != nil {
 		LogInstance.WithFields(logrus.Fields{
 			"context": "wrong msgbody",
 		}).Info("info log")
 		return err
 	}
-	if os.Getenv("Org") != "" {
-		orgInfo = os.Getenv("Org")
-	} else {
-		orgInfo = repoInfo.Org
-	}
-
-	if os.Getenv("Repo") != "" {
-		repoNameInfo = os.Getenv("Repo")
-	} else {
-		repoNameInfo = repoInfo.Repo
-	}
 	issueID := msgInfo.IssueID
 	eventType := msgInfo.EventType
+	orgInfo := msgInfo.RepoInfo.Org
+	repoNameInfo := msgInfo.RepoInfo.Repo
 	generalContent := msgInfo.TargetInfo.InfoContent.GeneralContent
 	chineseContent := msgInfo.TargetInfo.InfoContent.ChineseContent
 	englishContent := msgInfo.TargetInfo.InfoContent.EnglishContent
@@ -277,6 +258,9 @@ func eventHandler(msg amqp.Delivery) error {
 				fmt.Println(res.Error())
 				LogInstance.WithFields(logrus.Fields{
 					"context": "AssigneeReminder CreateGiteeIssueComment error",
+                    "orgInfo": orgInfo,
+                    "repoNameInfo": repoNameInfo,
+                    "issueID": issueID,
 				}).Info("info log")
 				return res
 			}
