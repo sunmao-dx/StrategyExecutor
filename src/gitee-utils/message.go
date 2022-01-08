@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -225,7 +224,6 @@ func getToken() []byte {
 
 func eventHandler(msg amqp.Delivery) error {
 	var msgInfo Issue
-	lineBreaker := "\n"
 
 	err := json.Unmarshal(msg.Body, &msgInfo)
 	if err != nil {
@@ -239,37 +237,13 @@ func eventHandler(msg amqp.Delivery) error {
 	orgInfo := msgInfo.RepoInfo.Org
 	repoNameInfo := msgInfo.RepoInfo.Repo
 	generalContent := msgInfo.TargetInfo.InfoContent.GeneralContent
-	chineseContent := msgInfo.TargetInfo.InfoContent.ChineseContent
-	englishContent := msgInfo.TargetInfo.InfoContent.EnglishContent
 	infoType := msgInfo.TargetInfo.InfoType
-	targetUser := msgInfo.TargetInfo.TargetUser
 	c := NewClient(getToken)
 
 	switch eventType {
 	case "info":
 		switch infoType {
-		case "AssigneeReminder":
-			infoTemp := strings.Replace(generalContent, "{"+"mainCaller1"+"}", fmt.Sprintf("%v", targetUser[0]), -1)
-			infoTemp = strings.Replace(infoTemp, "{"+"mainCaller2"+"}", fmt.Sprintf("%v", targetUser[1]), -1)
-			strInfo := englishContent + lineBreaker + chineseContent + lineBreaker + infoTemp
-			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
-			fmt.Println(strInfo)
-			if res != nil {
-				fmt.Println(res.Error())
-				LogInstance.WithFields(logrus.Fields{
-					"context": "AssigneeReminder CreateGiteeIssueComment error",
-                    "orgInfo": orgInfo,
-                    "repoNameInfo": repoNameInfo,
-                    "issueID": issueID,
-				}).Info("info log")
-				return res
-			}
-			LogInstance.WithFields(logrus.Fields{
-				"context": "AssigneeReminder CreateGiteeIssueComment success",
-				"body":    strInfo,
-				"msg":     string(msg.Body),
-			}).Info("info log")
-		case "LabelReminder":
+		case "issueComment":
 			strInfo := generalContent
 			res := c.CreateGiteeIssueComment(orgInfo, repoNameInfo, issueID, strInfo)
 			if res != nil {
