@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -202,6 +203,10 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 	for msg := range msgs {
 		err := eventHandler(msg)
 		if err != nil {
+			errMsg := err.Error()
+			if strings.Contains(errMsg, "404") {
+				msg.Acknowledger.Ack(msg.DeliveryTag, false)
+			}
 			log.Println("something wrong with executor", err)
 		} else {
 			msg.Acknowledger.Ack(msg.DeliveryTag, false)
