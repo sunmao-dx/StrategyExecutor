@@ -203,9 +203,8 @@ func (c *Consumer) consume(channel *amqp.Channel, id int) {
 		err := eventHandler(msg)
 		if err != nil {
 			log.Println("something wrong with executor", err)
-		} else {
-			msg.Acknowledger.Ack(msg.DeliveryTag, false)
 		}
+		msg.Acknowledger.Ack(msg.DeliveryTag, false)
 
 	}
 	log.Println("[", id, "] Exiting ...")
@@ -252,12 +251,13 @@ func eventHandler(msg amqp.Delivery) error {
 				}).Info("info log")
 				fmt.Println(res.Error())
 				return res
+			} else {
+				LogInstance.WithFields(logrus.Fields{
+					"context": "LabelReminder CreateGiteeIssueComment success",
+					"body":    strInfo,
+					"msg":     string(msg.Body),
+				}).Info("info log")
 			}
-			LogInstance.WithFields(logrus.Fields{
-				"context": "LabelReminder CreateGiteeIssueComment success",
-				"body":    strInfo,
-				"msg":     string(msg.Body),
-			}).Info("info log")
 		}
 
 	default:
