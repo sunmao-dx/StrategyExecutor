@@ -37,6 +37,7 @@ func doRabbitMQ() {
 		gitee_utils.LogInstance.WithFields(logrus.Fields{
 			"context": "Rabbitmq connect error",
 		}).Info("info log")
+		os.Exit(1)
 	}
 	cc := gitee_utils.ConsumerConfig{
 		ExchangeName:  RMQ_EXCHANGE_NAME,
@@ -53,6 +54,7 @@ func doRabbitMQ() {
 		gitee_utils.LogInstance.WithFields(logrus.Fields{
 			"context": "Consumer setup error",
 		}).Info("info log")
+		os.Exit(1)
 	}
 	gitee_utils.LogInstance.WithFields(logrus.Fields{
 		"context": "Consumer action success",
